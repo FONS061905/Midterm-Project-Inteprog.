@@ -2,7 +2,6 @@
 #include <cstring>
 #include <limits>
 #include <cctype>
-
 using namespace std;
 
 class Book {
@@ -52,31 +51,52 @@ public:
     void addBook() {
         char bid[20], bisbn[20], btitle[100], bauthor[100], bedition[20], bpublication[100], bcategory[20];
         
-        cout << "Enter Category (Fiction/Non-fiction): ";
-        cin >> bcategory;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        
-        while (true) {
-            cout << "Enter Book ID: ";
-            cin >> bid;
-            if (isDuplicateID(bid)) {
-                cout << "Duplicate ID! Please enter another ID.\n";
-            } else {
-                break;
+        cout << "Enter Category (Fiction/Non-fiction): "; cin >> bcategory;
+        for (int i = 0; bcategory[i]; i++) {
+            bcategory[i] = tolower(bcategory[i]);
+        }
+        while (strcmp(bcategory, "fiction") != 0 && strcmp(bcategory, "non-fiction") != 0) {
+            cout << "Category not found! Please enter again: ";
+            cin >> bcategory;
+            for (int i = 0; bcategory[i]; i++) {
+                bcategory[i] = tolower(bcategory[i]);
             }
         }
         
+        cout << "Enter Book ID: "; cin >> bid;
+        while (isDuplicateID(bid)) {
+            cout << "Duplicate ID! Please enter another ID: ";
+            cin >> bid;
+        }
+        
         cout << "Enter ISBN: "; cin >> bisbn;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Enter Title: "; cin.getline(btitle, 100);
+        cout << "Enter Title: "; cin.ignore(); cin.getline(btitle, 100);
         cout << "Enter Author: "; cin.getline(bauthor, 100);
         cout << "Enter Edition: "; cin >> bedition;
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "Enter Publication: "; cin.getline(bpublication, 100);
+        cout << "Enter Publication: "; cin.ignore(); cin.getline(bpublication, 100);
         
         books[bookCount].setBookDetails(bid, bisbn, btitle, bauthor, bedition, bpublication, bcategory);
         bookCount++;
         cout << "Book added successfully!\n";
+    }
+
+    void editBook() {
+        char bid[20], bisbn[20], btitle[100], bauthor[100], bedition[20], bpublication[100];
+        cout << "Enter Book ID to edit: "; cin >> bid;
+        for (int i = 0; i < bookCount; i++) {
+            if (strcmp(books[i].getID(), bid) == 0) {
+                cout << "Enter new ISBN: "; cin >> bisbn;
+                cout << "Enter new Title: "; cin.ignore(); cin.getline(btitle, 100);
+                cout << "Enter new Author: "; cin.getline(bauthor, 100);
+                cout << "Enter new Edition: "; cin >> bedition;
+                cout << "Enter new Publication: "; cin.ignore(); cin.getline(bpublication, 100);
+                
+                books[i].editBook(bisbn, btitle, bauthor, bedition, bpublication);
+                cout << "Book edited successfully!\n";
+                return;
+            }
+        }
+        cout << "Book not found!\n";
     }
 
     void deleteBook() {
@@ -89,6 +109,18 @@ public:
                 }
                 bookCount--;
                 cout << "Book deleted successfully!\n";
+                return;
+            }
+        }
+        cout << "Book not found!\n";
+    }
+
+    void searchBook() {
+        char bid[20];
+        cout << "Enter Book ID: "; cin >> bid;
+        for (int i = 0; i < bookCount; i++) {
+            if (strcmp(books[i].getID(), bid) == 0) {
+                books[i].getBookDetails();
                 return;
             }
         }
@@ -111,7 +143,7 @@ int main() {
     Library library;
     int choice;
     do {
-        cout << "1 - Add Book\n2 - Delete Book\n3 - View All Books\n4 - Exit\nEnter choice: ";
+        cout << "1 - Add Book\n2 - Edit Book\n3 - Search Book\n4 - Delete Book\n5 - View Books by Category\n6 - View All Books\n7 - Exit\nEnter choice: ";
         while (!(cin >> choice)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -120,12 +152,14 @@ int main() {
         
         switch (choice) {
             case 1: library.addBook(); break;
-            case 2: library.deleteBook(); break;
-            case 3: library.viewAllBooks(); break;
-            case 4: cout << "Exiting...\n"; break;
+            case 2: library.editBook(); break;
+            case 3: library.searchBook(); break;
+            case 4: library.deleteBook(); break;
+            case 5: library.viewAllBooks(); break;
+            case 6: library.viewAllBooks(); break;
+            case 7: cout << "Exiting...\n"; break;
             default: cout << "Invalid choice!\n";
         }
-    } while (choice != 4);
+    } while (choice != 7);
     return 0;
 }
-
